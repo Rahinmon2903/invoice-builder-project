@@ -1,6 +1,117 @@
-import React from "react";
+import React, { useMemo, useRef, useState } from "react";
+import PrintableInvoice from "./printableInvoice";
+import html2pdf from "react";
 
 const CreateInvoice = () => {
+  const [client, setClient] = useState({
+    name: "",
+    mobile: "",
+    email: "",
+    address: "",
+  });
+
+  const [invoice, setInvoice] = useState({
+    invoiceNo: "INV-001",
+    date: new Date().toISOString().slice(0, 10),
+    dueDate: "",
+    currency: "INR",
+  });
+
+  const [items, setItems] = useState([
+    { id: Date.now(), description: "", price: 0, qty: 1, total: 0 },
+  ]);
+
+  const [taxes, setTaxes] = useState([]);
+  const [fees, setFees] = useState([]);
+
+  const updateItem = (id, field, value) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id == id) {
+          const updated = { ...item, [field]: value };
+          updated.total = Number(updated.price || 0) * Number(updated.qty || 0);
+          return updated;
+        }
+        return item;
+      })
+    );
+  };
+
+  const addItem = () => {
+    setItems((prev) => [
+      ...prev,
+      { id: Date.now(), description: "", price: 0, qty: 1, total: 0 },
+    ]);
+  };
+  const deleteItem = (id) => {
+    setItems((prev) => prev.filter((item) => item.id != id));
+  };
+
+  const subTotal = useMemo(() => {
+    return items.reduce((ac, c) => ac + (Number(c.total) || 0), 0);
+  }, [items]);
+
+  const totalTax = useMemo(() => {
+    return taxes.reduce(
+      (ac, c) => ac + subTotal * (Number(c.percent) / 100 || 0),
+      0
+    );
+  }, [taxes, subTotal]);
+
+  const totalFees = useMemo(() => {
+    return fees.reduce((ac, c) => ac + (Number(c.amount) || 0), 0);
+  }, [fees]);
+
+  const grandTotal = subTotal + totalTax + totalFees;
+
+  const formatCurrency = (value, currency = invoice.currency) => {
+    const symbol = currency === "INR" ? "₹" : currency === "USD" ? "$" : "€";
+
+    return `${symbol}${Number(value || 0).toFixed(2)}`;
+  };
+
+  const addTax = () => {
+    setTaxes((prev) => [...prev, { id: Date.now(), name: "GST", percent: 18 }]);
+  };
+  const updateTax = (id, field, value) => {
+    setTaxes((prev) =>
+      prev.map((it) => (it.id == id ? { ...it, [field]: value } : it))
+    );
+  };
+
+  const deleteTax = (id) => {
+    setTaxes((prev) => prev.filter((t) => t.id != id));
+  };
+
+  const addFees = () => {
+    setFees((prev) => [
+      ...prev,
+      { id: Date.now(), name: "extra fees", amount: 0 },
+    ]);
+  };
+  const updateFees = (id, field, value) => {
+    setFees((prev) =>
+      prev.map((it) => (it.id == id ? { ...it, [field]: value } : it))
+    );
+  };
+
+  const deleteFees = (id) => {
+    setFees((prev) => prev.filter((t) => t.id != id));
+  };
+
+  const printRef =useRef();
+
+  const exportPdf=()=>{
+    const element= printRef.current();
+
+    const options={
+      margin: 10,
+      filename:`${invoice.invoiceNo}.pdf`,
+      image : { type: "jpeg", quality: 0.98 },
+
+    }
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* SIDEBAR */}
@@ -64,16 +175,37 @@ const CreateInvoice = () => {
             <h3 className="text-lg font-semibold mb-4">Billing To</h3>
 
             <div className="grid grid-cols-2 gap-4">
-              <input className="border rounded p-2" placeholder="Client Name" />
               <input
+                name="name"
+                value={client.name}
+                onChange={(e) => setClient({ ...client, name: e.target.value })}
+                className="border rounded p-2"
+                placeholder="Client Name"
+              />
+              <input
+                name="mobile"
+                value={client.mobile}
+                onChange={(e) =>
+                  setClient({ ...client, mobile: e.target.value })
+                }
                 className="border rounded p-2"
                 placeholder="Client Mobile"
               />
               <input
+                name="email"
+                value={client.email}
+                onChange={(e) =>
+                  setClient({ ...client, email: e.target.value })
+                }
                 className="border rounded p-2 col-span-2"
                 placeholder="Client Email"
               />
               <textarea
+                name="address"
+                value={client.address}
+                onChange={(e) =>
+                  setClient({ ...client, address: e.target.value })
+                }
                 className="border rounded p-2 col-span-2"
                 placeholder="Client Address"
                 rows="3"
@@ -86,6 +218,11 @@ const CreateInvoice = () => {
             <div>
               <p className="text-gray-600 text-sm mb-1">Invoice Number</p>
               <input
+                name="invoiceNo"
+                value={invoice.invoiceNo}
+                onChange={(e) =>
+                  setInvoice({ ...invoice, invoiceNo: e.target.value })
+                }
                 className="w-full border rounded p-2"
                 placeholder="INV-001"
               />
@@ -93,20 +230,44 @@ const CreateInvoice = () => {
 
             <div>
               <p className="text-gray-600 text-sm mb-1">Creation Date</p>
-              <input type="date" className="w-full border rounded p-2" />
+              <input
+                name="date"
+                value={invoice.date}
+                onChange={(e) =>
+                  setInvoice({ ...invoice, date: e.target.value })
+                }
+                type="date"
+                className="w-full border rounded p-2"
+              />
             </div>
 
             <div>
               <p className="text-gray-600 text-sm mb-1">Due Date</p>
-              <input type="date" className="w-full border rounded p-2" />
+              <input
+                name="dueDate"
+                value={invoice.dueDate}
+                onChange={(e) =>
+                  setInvoice({ ...invoice, dueDate: e.target.value })
+                }
+                type="date"
+                className="w-full border rounded p-2"
+              />
             </div>
 
             <div>
               <p className="text-gray-600 text-sm mb-1">Currency</p>
-              <select className="w-full border rounded p-2">
-                <option>INR (₹)</option>
-                <option>USD ($)</option>
-                <option>EUR (€)</option>
+
+              <select
+                className="w-full border rounded p-2"
+                name="currency"
+                value={invoice.currency}
+                onChange={(e) =>
+                  setInvoice({ ...invoice, currency: e.target.value })
+                }
+              >
+                <option value="INR">INR (₹)</option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
               </select>
             </div>
           </div>
@@ -128,37 +289,64 @@ const CreateInvoice = () => {
             </thead>
 
             <tbody>
-              <tr className="border-b">
-                <td className="py-3 px-3">
-                  <input
-                    className="w-full border p-2 rounded"
-                    placeholder="Item description"
-                  />
-                </td>
+              {items.map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="py-3 px-3">
+                    <input
+                      name="description"
+                      value={item.description}
+                      onChange={(e) =>
+                        updateItem(item.id, "description", e.target.value)
+                      }
+                      className="w-full border p-2 rounded"
+                      placeholder="Item description"
+                    />
+                  </td>
 
-                <td className="px-3">
-                  <input
-                    className="w-full border p-2 rounded"
-                    placeholder="0"
-                  />
-                </td>
+                  <td className="px-3">
+                    <input
+                      name="price"
+                      value={item.price}
+                      onChange={(e) =>
+                        updateItem(item.id, "price", e.target.value)
+                      }
+                      className="w-full border p-2 rounded"
+                      placeholder="0"
+                    />
+                  </td>
 
-                <td className="px-3">
-                  <input
-                    className="w-full border p-2 rounded"
-                    placeholder="0"
-                  />
-                </td>
+                  <td className="px-3">
+                    <input
+                      name="qty"
+                      value={item.qty}
+                      onChange={(e) =>
+                        updateItem(item.id, "qty", e.target.value)
+                      }
+                      className="w-full border p-2 rounded"
+                      placeholder="0"
+                    />
+                  </td>
 
-                <td className="px-3 text-gray-700 font-medium">₹0.00</td>
+                  <td className="px-3 text-gray-700 font-medium">
+                    {item.total}
+                  </td>
 
-                <td className="px-3 text-red-500 cursor-pointer text-xl">🗑️</td>
-              </tr>
+                  <td
+                    onClick={() => deleteItem(item.id)}
+                    className="px-3 text-red-500 cursor-pointer text-xl"
+                  >
+                    🗑️
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
           <div className="flex gap-4 mt-4">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
+            <button
+              onClick={addItem}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md"
+            >
               + Add Product
             </button>
             <button className="px-4 py-2 bg-green-600 text-white rounded-md">
@@ -172,32 +360,80 @@ const CreateInvoice = () => {
           <div className="w-full max-w-sm bg-white p-6 rounded-xl shadow-sm border space-y-4">
             <div className="flex justify-between text-gray-700">
               <p>Subtotal</p>
-              <p>₹0.00</p>
+              <p>{formatCurrency(subTotal)}</p>
+            </div>
+            <div className="flex justify-between text-gray-700">
+              <p>Total Tax</p>
+              <p>{formatCurrency(totalTax)}</p>
+            </div>
+            <div className="flex justify-between text-gray-700">
+              <p>Total Fees</p>
+              <p>{formatCurrency(totalFees)}</p>
             </div>
 
             <hr />
 
-            <div className="flex gap-3">
-              <input
-                className="flex-1 border p-2 rounded"
-                placeholder="Tax Type"
-              />
-              <input className="w-24 border p-2 rounded" placeholder="0%" />
-            </div>
+            {taxes.map((tax) => (
+              <div key={tax.id} className="flex items-center gap-3">
+                <input
+                  className="flex-1 border p-2 rounded"
+                  value={tax.name}
+                  onChange={(e) => updateTax(tax.id, "name", e.target.value)}
+                />
 
-            <button className="px-3 py-1 bg-blue-600 text-white rounded-md">
+                <input
+                  className="w-24 border p-2 rounded"
+                  value={tax.percent}
+                  onChange={(e) =>
+                    updateTax(tax.id, "percent", Number(e.target.value))
+                  }
+                />
+
+                <button
+                  onClick={() => deleteTax(tax.id)}
+                  className="text-red-500 text-xl"
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
+
+            <button
+              onClick={addTax}
+              className="px-3 py-1 bg-blue-600 text-white rounded-md"
+            >
               + Add Tax
             </button>
 
-            <div className="flex gap-3">
-              <input
-                className="flex-1 border p-2 rounded"
-                placeholder="Extra Fee"
-              />
-              <input className="w-24 border p-2 rounded" placeholder="0" />
-            </div>
+            {fees.map((fee) => (
+              <div key={fee.id} className="flex items-center gap-3">
+                <input
+                  className="flex-1 border p-2 rounded"
+                  value={fee.name}
+                  onChange={(e) => updateFees(fee.id, "name", e.target.value)}
+                />
 
-            <button className="px-3 py-1 bg-green-600 text-white rounded-md">
+                <input
+                  className="w-24 border p-2 rounded"
+                  value={fee.amount}
+                  onChange={(e) =>
+                    updateFees(fee.id, "amount", Number(e.target.value))
+                  }
+                />
+
+                <button
+                  onClick={() => deleteFees(fee.id)}
+                  className="text-red-500 text-xl"
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
+
+            <button
+              onClick={addFees}
+              className="px-3 py-1 bg-green-600 text-white rounded-md"
+            >
               + Add Fee
             </button>
 
@@ -205,10 +441,21 @@ const CreateInvoice = () => {
 
             <div className="flex justify-between text-xl font-semibold">
               <p>Total</p>
-              <p>₹0.00</p>
+              <p>{formatCurrency(grandTotal)}</p>
             </div>
+           
           </div>
         </div>
+         <PrintableInvoice
+              client={client}
+              invoice={invoice}
+              items={items}
+              subtotal={subTotal}
+              totalTax={totalTax}
+              totalFees={totalFees}
+              grandTotal={grandTotal}
+              formatCurrency={formatCurrency}
+            />
 
         {/* FOOTER BUTTONS */}
         <div className="flex justify-end gap-3 mt-10">
