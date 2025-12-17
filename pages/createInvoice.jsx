@@ -1,6 +1,9 @@
 import React, { useMemo, useRef, useState } from "react";
+
+import html2pdf from "html2pdf.js";
+
 import PrintableInvoice from "./printableInvoice";
-import html2pdf from "react";
+import { useNavigate } from "react-router-dom";
 
 const CreateInvoice = () => {
   const [client, setClient] = useState({
@@ -9,6 +12,7 @@ const CreateInvoice = () => {
     email: "",
     address: "",
   });
+  const navigate=useNavigate();
 
   const [invoice, setInvoice] = useState({
     invoiceNo: "INV-001",
@@ -99,18 +103,39 @@ const CreateInvoice = () => {
     setFees((prev) => prev.filter((t) => t.id != id));
   };
 
-  const printRef =useRef();
+  const printRef = useRef();
 
-  const exportPdf=()=>{
-    const element= printRef.current();
+  const exportPdf = () => {
+    const element = printRef.current;
 
-    const options={
+    const options = {
       margin: 10,
-      filename:`${invoice.invoiceNo}.pdf`,
-      image : { type: "jpeg", quality: 0.98 },
+      filename: `${invoice.invoiceNo}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2, scrollY: 0 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
 
-    }
-  }
+    html2pdf().set(options).from(element).save();
+  };
+
+  const saveInvoice = (status) => {
+    const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
+    const payload = {
+    id: Date.now(),
+    client,
+    invoice,
+    items,
+    taxes,
+    fees,
+    status,
+    totals: { subTotal, totalTax, totalFees, grandTotal }
+  };
+    localStorage.setItem("Invoices",JSON.stringify([payload,...stored]))
+    alert("Invoice saved!");
+  };
+
+ 
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -121,18 +146,13 @@ const CreateInvoice = () => {
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
-          <button className="w-full text-left py-2 px-4 rounded hover:bg-gray-100">
+          <button onClick={()=>navigate("/")} className="w-full text-left py-2 px-4 rounded hover:bg-gray-100">
             Dashboard
           </button>
           <button className="w-full text-left py-2 px-4 bg-blue-100 text-blue-600 rounded font-medium">
             Invoices
           </button>
-          <button className="w-full text-left py-2 px-4 rounded hover:bg-gray-100">
-            Clients
-          </button>
-          <button className="w-full text-left py-2 px-4 rounded hover:bg-gray-100">
-            Products
-          </button>
+         
         </nav>
       </aside>
 
@@ -153,7 +173,10 @@ const CreateInvoice = () => {
             <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
               View Mode
             </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <button
+              onClick={exportPdf}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
               Export PDF
             </button>
           </div>
@@ -443,31 +466,32 @@ const CreateInvoice = () => {
               <p>Total</p>
               <p>{formatCurrency(grandTotal)}</p>
             </div>
-           
           </div>
         </div>
-         <PrintableInvoice
-              client={client}
-              invoice={invoice}
-              items={items}
-              subtotal={subTotal}
-              totalTax={totalTax}
-              totalFees={totalFees}
-              grandTotal={grandTotal}
-              formatCurrency={formatCurrency}
-            />
+        <div ref={printRef} style={{ position: "absolute", left: "-9999px" }}>
+          <PrintableInvoice
+            client={client}
+            invoice={invoice}
+            items={items}
+            subtotal={subTotal}
+            totalTax={totalTax}
+            totalFees={totalFees}
+            grandTotal={grandTotal}
+            formatCurrency={formatCurrency}
+          />
+        </div>
 
         {/* FOOTER BUTTONS */}
         <div className="flex justify-end gap-3 mt-10">
-          <button className="px-5 py-2.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+          <button onClick={()=>saveInvoice("Draft")} className="px-5 py-2.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
             Save as Draft
           </button>
 
-          <button className="px-5 py-2.5 rounded-md bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition">
+          <button onClick={() => saveInvoice("Unpaid")} className="px-5 py-2.5 rounded-md bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition">
             Save as Unpaid
           </button>
 
-          <button className="px-5 py-2.5 rounded-md bg-green-600 text-white shadow-sm hover:bg-green-700 transition">
+          <button onClick={() => saveInvoice("Paid")} className="px-5 py-2.5 rounded-md bg-green-600 text-white shadow-sm hover:bg-green-700 transition">
             Save as Paid
           </button>
         </div>

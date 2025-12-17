@@ -2,7 +2,9 @@ import React from 'react';
 import HomePage from '../pages/HomePage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CreateInvoice from '../pages/createInvoice';
-import Header from '../pages/Header';
+
+import ViewInvoice from '../pages/ViewInvoice';
+import EditInvoice from '../pages/EditInvoice';
 
 
 const App = () => {
@@ -13,6 +15,8 @@ const App = () => {
     <Routes>
       <Route path="/" element={  <HomePage/>}></Route>
       <Route path="/create-invoice" element={  <CreateInvoice/>}></Route>
+      <Route path="/view/:id" element={  <ViewInvoice/>}></Route>
+      <Route path="/edit/:id" element={  <EditInvoice/>}></Route>
 
     </Routes>
     
