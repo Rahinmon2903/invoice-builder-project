@@ -47,11 +47,14 @@ const EditInvoice = () => {
     [items]
   );
 
-  const totalTax = useMemo(
-    () =>
-      taxes.reduce((s, t) => s + subTotal * (Number(t.percent) / 100 || 0), 0),
-    [taxes, subTotal]
+
+  const totalTax = useMemo(() => {
+  const totalPercent = taxes.reduce(
+    (sum, t) => sum + Number(t.percent || 0),
+    0
   );
+  return (subTotal * totalPercent) / 100;
+}, [taxes, subTotal]);
 
   const totalFees = useMemo(
     () => fees.reduce((s, f) => s + Number(f.amount || 0), 0),

@@ -56,11 +56,13 @@ const CreateInvoice = () => {
   }, [items]);
 
   const totalTax = useMemo(() => {
-    return taxes.reduce(
-      (ac, c) => ac + subTotal * (Number(c.percent) / 100 || 0),
-      0
-    );
-  }, [taxes, subTotal]);
+  const totalPercent = taxes.reduce(
+    (sum, t) => sum + Number(t.percent || 0),
+    0
+  );
+
+  return (subTotal * totalPercent) / 100;
+}, [taxes, subTotal]);
 
   const totalFees = useMemo(() => {
     return fees.reduce((ac, c) => ac + (Number(c.amount) || 0), 0);
@@ -462,30 +464,28 @@ const CreateInvoice = () => {
             </div>
           </div>
         </div>
-        <div
-          ref={printRef}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "794px",
-            background: "#ffffff",
-            color: "#000000",
-            fontFamily: "Arial",
-            all: "initial",
-          }}
-        >
-          <PrintableInvoice
-            client={client}
-            invoice={invoice}
-            items={items}
-            subtotal={subTotal}
-            totalTax={totalTax}
-            totalFees={totalFees}
-            grandTotal={grandTotal}
-            formatCurrency={formatCurrency}
-          />
-        </div>
+         <div
+         ref={printRef}
+         style={{
+           position: "absolute",
+           left: "-9999px",
+           top: 0,
+           width: "794px",
+           background: "#ffffff",
+           color: "#000000",
+           fontFamily: "Arial, sans-serif",
+         }}
+       >
+         <PrintableInvoice
+           client={client}
+           invoice={invoice}
+           items={items}
+           subtotal={subTotal}
+           totalTax={totalTax}
+           totalFees={totalFees}
+           grandTotal={grandTotal}
+         />
+       </div>
 
         {/* FOOTER BUTTONS */}
         <div className="flex justify-end gap-3 mt-10">
