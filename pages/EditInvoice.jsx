@@ -1,19 +1,32 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import html2pdf from "html2pdf.js";
+
+import PrintableInvoice from "./printableInvoice";
 
 const EditInvoice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+const [client, setClient] = useState({
+  name: "",
+  email: "",
+  mobile: "",
+  address: "",
+});
 
-  const [client, setClient] = useState({});
-  const [invoice, setInvoice] = useState({});
+const [invoice, setInvoice] = useState({
+  invoiceNo: "",
+  date: "",
+  dueDate: "",
+  currency: "INR",
+});
   const [items, setItems] = useState([]);
   const [taxes, setTaxes] = useState([]);
   const [fees, setFees] = useState([]);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
-    const found = stored.find((it) => it.id == id);
+    const found = stored.find((it) => String(it.id) === String(id));
 
     if (!found) {
       alert("Invoice not found");
@@ -46,20 +59,104 @@ const EditInvoice = () => {
 
   const grandTotal = subTotal + totalTax + totalFees;
 
-  const updateInvoice=()=>{
+   const updateItem = (id, field, value) => {
+      setItems((prev) =>
+        prev.map((item) => {
+          if (item.id == id) {
+            const updated = { ...item, [field]: value };
+            updated.total = Number(updated.price || 0) * Number(updated.qty || 0);
+            return updated;
+          }
+          return item;
+        })
+      );
+    };
+  
+    const addItem = () => {
+      setItems((prev) => [
+        ...prev,
+        { id: Date.now(), description: "", price: 0, qty: 1, total: 0 },
+      ]);
+    };
+    const deleteItem = (id) => {
+      setItems((prev) => prev.filter((item) =>String(item.id) !== String(id)));
+    };
+  
     
+   
+  
+    const formatCurrency = (value, currency = invoice.currency) => {
+      const symbol = currency === "INR" ? "₹" : currency === "USD" ? "$" : "€";
+  
+      return `${symbol}${Number(value || 0).toFixed(2)}`;
+    };
+  
+    const addTax = () => {
+      setTaxes((prev) => [...prev, { id: Date.now(), name: "GST", percent: 18 }]);
+    };
+    const updateTax = (id, field, value) => {
+      setTaxes((prev) =>
+        prev.map((it) => (String(it.id) === String(id)? { ...it, [field]: value } : it))
+      );
+    };
+  
+    const deleteTax = (id) => {
+      setTaxes((prev) => prev.filter((it) => String(it.id) !== String(id)));
+    };
+  
+    const addFees = () => {
+      setFees((prev) => [
+        ...prev,
+        { id: Date.now(), name: "extra fees", amount: 0 },
+      ]);
+    };
+    const updateFees = (id, field, value) => {
+      setFees((prev) =>
+        prev.map((it) => (String(it.id) == String(id) ? { ...it, [field]: value } : it))
+      );
+    };
+  
+    const deleteFees = (id) => {
+      setFees((prev) => prev.filter((t) => String(t.id) !== String(id)));
+    };
+  
+    const printRef = useRef();
+  
+const exportPdf = () => {
+  if (!printRef.current) return;
+
+  html2pdf()
+    .from(printRef.current)
+    .save(`${invoice.invoiceNo || "invoice"}.pdf`);
+};
+
+  const updateInvoice=(status)=>{
+    const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
+    const updated=stored.map(inv => String(inv.id) == String(id)?{
+        ...inv,
+        client,
+            invoice,
+            items,
+            taxes,
+            fees,
+            status,
+            totals: { subTotal, totalTax, totalFees, grandTotal }
+    } : inv)
+     localStorage.setItem("Invoices", JSON.stringify(updated));
+    alert("Invoice updated successfully");
+    navigate("/");
+
   }
 
 
-  return (
-    <div>
+  
       return (
       <div className="flex h-screen bg-gray-100">
         {/* SIDEBAR */}
         <aside className="w-64 bg-white border-r shadow-sm flex flex-col">
           <div className="p-6 border-b">
             <h1 className="text-xl font-bold tracking-tight">
-              Invoice Builder
+               Invoice Builder
             </h1>
           </div>
 
@@ -85,7 +182,7 @@ const EditInvoice = () => {
                 ←
               </button>
               <h2 className="text-3xl font-semibold tracking-tight">
-                New Invoice
+               Edit Invoice
               </h2>
             </div>
 
@@ -94,6 +191,7 @@ const EditInvoice = () => {
                 View Mode
               </button>
               <button
+               type="button"
                 onClick={exportPdf}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
@@ -390,7 +488,18 @@ const EditInvoice = () => {
               </div>
             </div>
           </div>
-          <div ref={printRef} style={{ position: "absolute", left: "-9999px" }}>
+          <div ref={printRef}  style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "794px",
+    background: "#ffffff",
+    color: "#000000",
+    fontFamily: "Arial",
+    all: "initial",       
+  }}
+  
+  >
             <PrintableInvoice
               client={client}
               invoice={invoice}
@@ -428,8 +537,7 @@ const EditInvoice = () => {
           </div>
         </main>
       </div>
-      );
-    </div>
+    
   );
 };
 

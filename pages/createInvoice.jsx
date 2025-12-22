@@ -12,7 +12,7 @@ const CreateInvoice = () => {
     email: "",
     address: "",
   });
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const [invoice, setInvoice] = useState({
     invoiceNo: "INV-001",
@@ -105,37 +105,29 @@ const CreateInvoice = () => {
 
   const printRef = useRef();
 
-  const exportPdf = () => {
-    const element = printRef.current;
+ const exportPdf = () => {
+  if (!printRef.current) return;
 
-    const options = {
-      margin: 10,
-      filename: `${invoice.invoiceNo}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, scrollY: 0 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
-
-    html2pdf().set(options).from(element).save();
-  };
+  html2pdf()
+    .from(printRef.current)
+    .save(`${invoice.invoiceNo || "invoice"}.pdf`);
+};
 
   const saveInvoice = (status) => {
     const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
     const payload = {
-    id: Date.now(),
-    client,
-    invoice,
-    items,
-    taxes,
-    fees,
-    status,
-    totals: { subTotal, totalTax, totalFees, grandTotal }
-  };
-    localStorage.setItem("Invoices",JSON.stringify([payload,...stored]))
+      id: Date.now(),
+      client,
+      invoice,
+      items,
+      taxes,
+      fees,
+      status,
+      totals: { subTotal, totalTax, totalFees, grandTotal },
+    };
+    localStorage.setItem("Invoices", JSON.stringify([payload, ...stored]));
     alert("Invoice saved!");
   };
-
- 
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -146,13 +138,15 @@ const CreateInvoice = () => {
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
-          <button onClick={()=>navigate("/")} className="w-full text-left py-2 px-4 rounded hover:bg-gray-100">
+          <button
+            onClick={() => navigate("/")}
+            className="w-full text-left py-2 px-4 rounded hover:bg-gray-100"
+          >
             Dashboard
           </button>
           <button className="w-full text-left py-2 px-4 bg-blue-100 text-blue-600 rounded font-medium">
             Invoices
           </button>
-         
         </nav>
       </aside>
 
@@ -468,7 +462,19 @@ const CreateInvoice = () => {
             </div>
           </div>
         </div>
-        <div ref={printRef} style={{ position: "absolute", left: "-9999px" }}>
+        <div
+          ref={printRef}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "794px",
+            background: "#ffffff",
+            color: "#000000",
+            fontFamily: "Arial",
+            all: "initial",
+          }}
+        >
           <PrintableInvoice
             client={client}
             invoice={invoice}
@@ -483,15 +489,24 @@ const CreateInvoice = () => {
 
         {/* FOOTER BUTTONS */}
         <div className="flex justify-end gap-3 mt-10">
-          <button onClick={()=>saveInvoice("Draft")} className="px-5 py-2.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+          <button
+            onClick={() => saveInvoice("Draft")}
+            className="px-5 py-2.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+          >
             Save as Draft
           </button>
 
-          <button onClick={() => saveInvoice("Unpaid")} className="px-5 py-2.5 rounded-md bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition">
+          <button
+            onClick={() => saveInvoice("Unpaid")}
+            className="px-5 py-2.5 rounded-md bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition"
+          >
             Save as Unpaid
           </button>
 
-          <button onClick={() => saveInvoice("Paid")} className="px-5 py-2.5 rounded-md bg-green-600 text-white shadow-sm hover:bg-green-700 transition">
+          <button
+            onClick={() => saveInvoice("Paid")}
+            className="px-5 py-2.5 rounded-md bg-green-600 text-white shadow-sm hover:bg-green-700 transition"
+          >
             Save as Paid
           </button>
         </div>

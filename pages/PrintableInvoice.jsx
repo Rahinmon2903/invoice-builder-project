@@ -6,91 +6,149 @@ const PrintableInvoice = ({
   totalTax,
   totalFees,
   grandTotal,
-  formatCurrency
 }) => {
   return (
-    <div id="invoicePrint" className="p-10 bg-white text-gray-900 max-w-3xl mx-auto border shadow-lg rounded-lg">
-
-      {/* Header */}
-      <header className="flex justify-between items-start mb-10 border-b pb-5">
+    <div
+      style={{
+        width: "794px", // A4 width
+        padding: "28px",
+        background: "#ffffff",
+        color: "#000",
+        fontFamily: "Arial, sans-serif",
+        fontSize: "13px",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* HEADER */}
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight">INVOICE</h1>
-          <p className="mt-2 text-gray-600 text-sm">#{invoice.invoiceNo}</p>
-          <p className="text-gray-600 text-sm">Date: {invoice.date}</p>
-          {invoice.dueDate && (
-            <p className="text-gray-600 text-sm">Due: {invoice.dueDate}</p>
-          )}
+          <h1 style={{ margin: 0, fontSize: 26, letterSpacing: 1 }}>
+            INVOICE
+          </h1>
+          <div style={{ marginTop: 6 }}>
+            <strong>Invoice No:</strong> {invoice.invoiceNo}
+          </div>
+          <div>
+            <strong>Date:</strong> {invoice.date}
+          </div>
         </div>
 
-        <div className="text-right">
-          <p className="font-semibold text-lg text-gray-800">Bill To</p>
-          <p className="text-gray-700">{client.name}</p>
-          <p className="text-gray-600">{client.email}</p>
-          <p className="text-gray-600">{client.mobile}</p>
-          <p className="text-gray-600">{client.address}</p>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontWeight: "bold" }}>Bill To</div>
+          <div>{client.name}</div>
+          <div>{client.email}</div>
+          <div>{client.mobile}</div>
         </div>
-      </header>
+      </div>
 
-      {/* Items Table */}
-      <table className="w-full border-collapse mb-8">
+      <hr style={{ margin: "18px 0" }} />
+
+      {/* ITEMS TABLE */}
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          marginBottom: 16,
+        }}
+      >
         <thead>
-          <tr className="bg-gray-100 border border-gray-300">
-            <th className="p-3 text-left font-semibold">Description</th>
-            <th className="p-3 text-center font-semibold w-20">Qty</th>
-            <th className="p-3 text-right font-semibold w-32">Rate</th>
-            <th className="p-3 text-right font-semibold w-32">Total</th>
+          <tr style={{ background: "#333", color: "#fff" }}>
+            <th style={thLeft}>Item</th>
+            <th style={thCenter}>Qty</th>
+            <th style={thRight}>Rate</th>
+            <th style={thRight}>Amount</th>
           </tr>
         </thead>
-
         <tbody>
-          {items.map((it) => (
-            <tr key={it.id} className="border-b border-gray-200">
-              <td className="p-3">{it.description}</td>
-              <td className="p-3 text-center">{it.qty}</td>
-              <td className="p-3 text-right">{formatCurrency(it.price)}</td>
-              <td className="p-3 text-right font-medium">
-                {formatCurrency(it.total)}
-              </td>
+          {items.map((i) => (
+            <tr key={i.id}>
+              <td style={tdLeft}>{i.description}</td>
+              <td style={tdCenter}>{i.qty}</td>
+              <td style={tdRight}>₹{i.price}</td>
+              <td style={tdRight}>₹{i.total}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Totals Section */}
-      <div className="flex justify-end">
-        <div className="w-64 space-y-2 text-right">
-
-          <div className="flex justify-between text-gray-700">
-            <span>Subtotal:</span>
-            <span>{formatCurrency(subtotal)}</span>
+      {/* TOTALS */}
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div style={{ width: "38%" }}>
+          <div style={row}>
+            <span>Subtotal</span>
+            <span>₹{subtotal}</span>
+          </div>
+          <div style={row}>
+            <span>Tax</span>
+            <span>₹{totalTax}</span>
+          </div>
+          <div style={row}>
+            <span>Fees</span>
+            <span>₹{totalFees}</span>
           </div>
 
-          <div className="flex justify-between text-gray-700">
-            <span>Tax:</span>
-            <span>{formatCurrency(totalTax)}</span>
-          </div>
-
-          <div className="flex justify-between text-gray-700">
-            <span>Extra Fees:</span>
-            <span>{formatCurrency(totalFees)}</span>
-          </div>
-
-          <hr className="my-2" />
-
-          <div className="flex justify-between text-xl font-bold">
-            <span>Total:</span>
-            <span>{formatCurrency(grandTotal)}</span>
+          <div
+            style={{
+              ...row,
+              marginTop: 8,
+              paddingTop: 8,
+              borderTop: "2px solid #000",
+              fontWeight: "bold",
+              fontSize: "15px",
+            }}
+          >
+            <span>Total</span>
+            <span>₹{grandTotal}</span>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="mt-10 text-center text-gray-500 text-sm">
-        Thank you for your business!
-      </footer>
-
+      {/* FOOTER */}
+      <div style={{ marginTop: 30, fontSize: 12 }}>
+        <strong>Notes:</strong>
+        <div>Thank you for your business.</div>
+      </div>
     </div>
   );
+};
+
+/* ===== styles ===== */
+const thLeft = {
+  padding: 8,
+  textAlign: "left",
+};
+
+const thCenter = {
+  padding: 8,
+  textAlign: "center",
+};
+
+const thRight = {
+  padding: 8,
+  textAlign: "right",
+};
+
+const tdLeft = {
+  padding: 8,
+  borderBottom: "1px solid #ddd",
+};
+
+const tdCenter = {
+  padding: 8,
+  textAlign: "center",
+  borderBottom: "1px solid #ddd",
+};
+
+const tdRight = {
+  padding: 8,
+  textAlign: "right",
+  borderBottom: "1px solid #ddd",
+};
+
+const row = {
+  display: "flex",
+  justifyContent: "space-between",
+  marginBottom: 6,
 };
 
 export default PrintableInvoice;
