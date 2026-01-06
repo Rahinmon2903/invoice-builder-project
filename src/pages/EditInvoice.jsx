@@ -6,6 +6,7 @@ import PrintableInvoice from "./PrintableInvoice";
 const EditInvoice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   const [client, setClient] = useState({
     name: "",
@@ -27,6 +28,7 @@ const EditInvoice = () => {
 
   /* ===== Load invoice ===== */
   useEffect(() => {
+     setLoading(true);
     const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
     const found = stored.find((it) => String(it.id) === String(id));
 
@@ -41,7 +43,10 @@ const EditInvoice = () => {
     setItems(found.items || []);
     setTaxes(found.taxes || []);
     setFees(found.fees || []);
+    setLoading(false);
   }, [id, navigate]);
+
+
 
   /* ===== Totals ===== */
   const subTotal = useMemo(
@@ -123,6 +128,7 @@ const EditInvoice = () => {
 
   /* ===== Save ===== */
   const updateInvoice = (status) => {
+      setLoading(true);
     const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
 
     const updated = stored.map((inv) =>
@@ -146,7 +152,16 @@ const EditInvoice = () => {
   };
 
   return (
+
     <div className="min-h-screen bg-[#FAFAFA] text-[#111]">
+       {loading && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 border-4 border-gray-300 border-t-black rounded-full animate-spin" />
+          <p className="text-sm text-gray-500">Loading invoice…</p>
+        </div>
+      </div>
+    )}
       {/* Header */}
       <header className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-8 py-6 flex justify-between items-center">

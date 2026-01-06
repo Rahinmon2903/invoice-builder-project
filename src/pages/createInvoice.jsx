@@ -158,7 +158,7 @@ const totalTax = useMemo(() => {
           New Invoice
         </h2>
 
-        {/* ================= UI UNCHANGED ================= */}
+       
         {/* Billing + Meta */}
         <div className="grid grid-cols-3 gap-10">
           <div className="col-span-2 bg-white border rounded-xl p-6">
