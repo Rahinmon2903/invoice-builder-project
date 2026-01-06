@@ -1,10 +1,10 @@
 import React from 'react';
-import HomePage from '../pages/HomePage';
+import HomePage from './pages/HomePage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import CreateInvoice from '../pages/createInvoice';
+import CreateInvoice from './pages/createInvoice';
 
-import ViewInvoice from '../pages/ViewInvoice';
-import EditInvoice from '../pages/EditInvoice';
+import ViewInvoice from './pages/ViewInvoice';
+import EditInvoice from './pages/EditInvoice';
 
 
 const App = () => {

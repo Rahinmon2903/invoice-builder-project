@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import PrintableInvoice from './printableInvoice';
+import PrintableInvoice from './PrintableInvoice';
 
 const ViewInvoice = () => {
     const [invoiceData,setInvoiceData]=useState(null);
