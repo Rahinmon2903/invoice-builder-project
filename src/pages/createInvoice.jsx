@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const CreateInvoice = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [client, setClient] = useState({
     name: "",
@@ -33,8 +34,7 @@ const CreateInvoice = () => {
       prev.map((item) => {
         if (String(item.id) === String(id)) {
           const updated = { ...item, [field]: value };
-          updated.total =
-            Number(updated.price || 0) * Number(updated.qty || 0);
+          updated.total = Number(updated.price || 0) * Number(updated.qty || 0);
           return updated;
         }
         return item;
@@ -50,9 +50,7 @@ const CreateInvoice = () => {
   };
 
   const deleteItem = (id) => {
-    setItems((prev) =>
-      prev.filter((item) => String(item.id) !== String(id))
-    );
+    setItems((prev) => prev.filter((item) => String(item.id) !== String(id)));
   };
 
   /* ===== Totals ===== */
@@ -61,12 +59,12 @@ const CreateInvoice = () => {
     [items]
   );
 
-const totalTax = useMemo(() => {
-  return taxes.reduce((sum, t) => {
-    const pct = Number(t.percent || 0);
-    return sum + (subTotal * pct) / 100;
-  }, 0);
-}, [taxes, subTotal]);
+  const totalTax = useMemo(() => {
+    return taxes.reduce((sum, t) => {
+      const pct = Number(t.percent || 0);
+      return sum + (subTotal * pct) / 100;
+    }, 0);
+  }, [taxes, subTotal]);
 
   const totalFees = useMemo(
     () => fees.reduce((sum, f) => sum + Number(f.amount || 0), 0),
@@ -77,8 +75,7 @@ const totalTax = useMemo(() => {
 
   /* ===== Helpers ===== */
   const formatCurrency = (val, currency = invoice.currency) => {
-    const symbol =
-      currency === "INR" ? "₹" : currency === "USD" ? "$" : "€";
+    const symbol = currency === "INR" ? "₹" : currency === "USD" ? "$" : "€";
     return `${symbol}${Number(val || 0).toFixed(2)}`;
   };
 
@@ -110,6 +107,7 @@ const totalTax = useMemo(() => {
 
   /* ===== Save ===== */
   const saveInvoice = (status) => {
+    setLoading(true);
     const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
 
     const payload = {
@@ -123,10 +121,7 @@ const totalTax = useMemo(() => {
       totals: { subTotal, totalTax, totalFees, grandTotal },
     };
 
-    localStorage.setItem(
-      "Invoices",
-      JSON.stringify([payload, ...stored])
-    );
+    localStorage.setItem("Invoices", JSON.stringify([payload, ...stored]));
 
     alert("Invoice saved!");
     navigate("/");
@@ -134,6 +129,14 @@ const totalTax = useMemo(() => {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#111]">
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-10 w-10 border-4 border-gray-300 border-t-black rounded-full animate-spin" />
+            <p className="text-sm text-gray-500">Please wait…</p>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <header className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-8 py-6 flex justify-between items-center">
@@ -154,11 +157,8 @@ const totalTax = useMemo(() => {
       </header>
 
       <main className="max-w-6xl mx-auto px-8 py-14 space-y-16">
-        <h2 className="text-3xl font-medium tracking-tight">
-          New Invoice
-        </h2>
+        <h2 className="text-3xl font-medium tracking-tight">New Invoice</h2>
 
-       
         {/* Billing + Meta */}
         <div className="grid grid-cols-3 gap-10">
           <div className="col-span-2 bg-white border rounded-xl p-6">
@@ -170,9 +170,7 @@ const totalTax = useMemo(() => {
               <input
                 placeholder="Client name"
                 value={client.name}
-                onChange={(e) =>
-                  setClient({ ...client, name: e.target.value })
-                }
+                onChange={(e) => setClient({ ...client, name: e.target.value })}
                 className="border rounded-md px-3 py-2 text-sm"
               />
               <input
@@ -238,9 +236,7 @@ const totalTax = useMemo(() => {
 
         {/* Items */}
         <div className="bg-white border rounded-xl p-6">
-          <h3 className="text-sm font-medium mb-5 text-gray-700">
-            Items
-          </h3>
+          <h3 className="text-sm font-medium mb-5 text-gray-700">Items</h3>
 
           <table className="w-full text-sm">
             <thead className="border-b text-gray-500">
@@ -302,134 +298,121 @@ const totalTax = useMemo(() => {
             </tbody>
           </table>
 
-          <button
-            onClick={addItem}
-            className="mt-5 text-sm font-medium"
-          >
+          <button onClick={addItem} className="mt-5 text-sm font-medium">
             + Add item
           </button>
         </div>
         {/* Taxes */}
-<div className="bg-white border rounded-xl p-6 max-w-sm ml-auto">
-  <h3 className="text-sm font-medium mb-4 text-gray-700">
-    Taxes
-  </h3>
+        <div className="bg-white border rounded-xl p-6 max-w-sm ml-auto">
+          <h3 className="text-sm font-medium mb-4 text-gray-700">Taxes</h3>
 
-  {taxes.map((tax) => (
-    <div key={tax.id} className="flex gap-2 mb-3">
-      <input
-        placeholder="Tax"
-        value={tax.name || ""}
-        onChange={(e) =>
-          setTaxes((prev) =>
-            prev.map((t) =>
-              t.id === tax.id ? { ...t, name: e.target.value } : t
-            )
-          )
-        }
-        className="border rounded-md px-2 py-1 text-sm flex-1"
-      />
+          {taxes.map((tax) => (
+            <div key={tax.id} className="flex gap-2 mb-3">
+              <input
+                placeholder="Tax"
+                value={tax.name || ""}
+                onChange={(e) =>
+                  setTaxes((prev) =>
+                    prev.map((t) =>
+                      t.id === tax.id ? { ...t, name: e.target.value } : t
+                    )
+                  )
+                }
+                className="border rounded-md px-2 py-1 text-sm flex-1"
+              />
 
-      <input
-        type="number"
-        placeholder="%"
-        value={tax.percent || ""}
-        onChange={(e) =>
-          setTaxes((prev) =>
-            prev.map((t) =>
-              t.id === tax.id
-                ? { ...t, percent: e.target.value }
-                : t
-            )
-          )
-        }
-        className="border rounded-md px-2 py-1 text-sm w-20 text-right"
-      />
+              <input
+                type="number"
+                placeholder="%"
+                value={tax.percent || ""}
+                onChange={(e) =>
+                  setTaxes((prev) =>
+                    prev.map((t) =>
+                      t.id === tax.id ? { ...t, percent: e.target.value } : t
+                    )
+                  )
+                }
+                className="border rounded-md px-2 py-1 text-sm w-20 text-right"
+              />
 
-      <button
-        onClick={() =>
-          setTaxes((prev) => prev.filter((t) => t.id !== tax.id))
-        }
-        className="text-gray-400 hover:text-red-500"
-      >
-        ×
-      </button>
-    </div>
-  ))}
+              <button
+                onClick={() =>
+                  setTaxes((prev) => prev.filter((t) => t.id !== tax.id))
+                }
+                className="text-gray-400 hover:text-red-500"
+              >
+                ×
+              </button>
+            </div>
+          ))}
 
-  <button
-    onClick={() =>
-      setTaxes((prev) => [
-        ...prev,
-        { id: Date.now(), name: "", percent: 0 },
-      ])
-    }
-    className="text-sm font-medium"
-  >
-    + Add tax
-  </button>
-</div>
-<div className="bg-white border rounded-xl p-6 max-w-sm ml-auto">
-  <h3 className="text-sm font-medium mb-4 text-gray-700">
-    Fees
-  </h3>
+          <button
+            onClick={() =>
+              setTaxes((prev) => [
+                ...prev,
+                { id: Date.now(), name: "", percent: 0 },
+              ])
+            }
+            className="text-sm font-medium"
+          >
+            + Add tax
+          </button>
+        </div>
+        <div className="bg-white border rounded-xl p-6 max-w-sm ml-auto">
+          <h3 className="text-sm font-medium mb-4 text-gray-700">Fees</h3>
 
-  {fees.map((fee) => (
-    <div key={fee.id} className="flex gap-2 mb-3">
-      <input
-        placeholder="Fee"
-        value={fee.name || ""}
-        onChange={(e) =>
-          setFees((prev) =>
-            prev.map((f) =>
-              f.id === fee.id ? { ...f, name: e.target.value } : f
-            )
-          )
-        }
-        className="border rounded-md px-2 py-1 text-sm flex-1"
-      />
+          {fees.map((fee) => (
+            <div key={fee.id} className="flex gap-2 mb-3">
+              <input
+                placeholder="Fee"
+                value={fee.name || ""}
+                onChange={(e) =>
+                  setFees((prev) =>
+                    prev.map((f) =>
+                      f.id === fee.id ? { ...f, name: e.target.value } : f
+                    )
+                  )
+                }
+                className="border rounded-md px-2 py-1 text-sm flex-1"
+              />
 
-      <input
-        type="number"
-        placeholder="₹"
-        value={fee.amount || ""}
-        onChange={(e) =>
-          setFees((prev) =>
-            prev.map((f) =>
-              f.id === fee.id
-                ? { ...f, amount: e.target.value }
-                : f
-            )
-          )
-        }
-        className="border rounded-md px-2 py-1 text-sm w-24 text-right"
-      />
+              <input
+                type="number"
+                placeholder="₹"
+                value={fee.amount || ""}
+                onChange={(e) =>
+                  setFees((prev) =>
+                    prev.map((f) =>
+                      f.id === fee.id ? { ...f, amount: e.target.value } : f
+                    )
+                  )
+                }
+                className="border rounded-md px-2 py-1 text-sm w-24 text-right"
+              />
 
-      <button
-        onClick={() =>
-          setFees((prev) => prev.filter((f) => f.id !== fee.id))
-        }
-        className="text-gray-400 hover:text-red-500"
-      >
-        ×
-      </button>
-    </div>
-  ))}
+              <button
+                onClick={() =>
+                  setFees((prev) => prev.filter((f) => f.id !== fee.id))
+                }
+                className="text-gray-400 hover:text-red-500"
+              >
+                ×
+              </button>
+            </div>
+          ))}
 
-  <button
-    onClick={() =>
-      setFees((prev) => [
-        ...prev,
-        { id: Date.now(), name: "", amount: 0 },
-      ])
-    }
-    className="text-sm font-medium"
-  >
-    + Add fee
-  </button>
-</div>
-
-
+          <button
+            onClick={() =>
+              setFees((prev) => [
+                ...prev,
+                { id: Date.now(), name: "", amount: 0 },
+              ])
+            }
+            className="text-sm font-medium"
+          >
+            + Add fee
+          </button>
+        </div>
 
         {/* Totals */}
         <div className="flex justify-end">
@@ -441,9 +424,7 @@ const totalTax = useMemo(() => {
             ].map(([label, val]) => (
               <div key={label} className="flex justify-between text-sm">
                 <span className="text-gray-600">{label}</span>
-                <span className="font-medium">
-                  {formatCurrency(val)}
-                </span>
+                <span className="font-medium">{formatCurrency(val)}</span>
               </div>
             ))}
 

@@ -3,18 +3,30 @@ import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [invoice, setInvoice] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  /* ===== Load invoices ===== */
   useEffect(() => {
+    setLoading(true);
+
     const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
     setInvoice(stored);
+
+    setLoading(false);
   }, []);
 
+  /* ===== Delete ===== */
   const deleteInvoice = (id) => {
+    setLoading(true);
+
     const updated = invoice.filter((it) => it.id !== id);
     setInvoice(updated);
     localStorage.setItem("Invoices", JSON.stringify(updated));
+
+    setTimeout(() => setLoading(false), 300);
   };
 
+  /* ===== Metrics ===== */
   const totalAmount = useMemo(
     () =>
       invoice.reduce(
@@ -48,6 +60,16 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#111]">
+      {/* ===== Loader ===== */}
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-10 w-10 border-4 border-gray-300 border-t-black rounded-full animate-spin" />
+            <p className="text-sm text-gray-500">Loading invoices…</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-8 py-7 flex items-center justify-between">
@@ -214,4 +236,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
