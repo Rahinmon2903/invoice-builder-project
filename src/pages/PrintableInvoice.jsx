@@ -20,16 +20,17 @@ const PrintableInvoice = ({
 
   return (
     <div style={page}>
-      {/* BRAND BLOCK */}
+      {/* BRAND */}
       <div style={brandWrapper}>
         <img src={logo} alt="Logo" style={logoStyle} />
-        <div style={business}>Golden Era</div>
-        <div style={service}>Professional Services</div>
+
+        <div style={brandText}>
+          <div style={business}>Golden Era</div>
+          <div style={service}>Professional Services</div>
+        </div>
       </div>
 
-      <div style={divider} />
-
-      {/* INVOICE HEADER */}
+      {/* HEADER */}
       <div style={invoiceHeader}>
         <div>
           <div style={label}>Bill To</div>
@@ -122,55 +123,51 @@ const PrintableInvoice = ({
 
 const page = {
   width: "794px",
-  padding: "48px",
+  padding: "44px",
   fontFamily: "Arial, sans-serif",
   fontSize: "13px",
   color: "#111",
   background: "#fff",
 };
 
-/* BRAND */
 const brandWrapper = {
-  marginTop: "20px",
-  marginBottom: "24px",
-  textAlign: "center",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  marginBottom: "32px",
 };
 
 const logoStyle = {
-  height: "90px",
-  width: "90px",
+  height: "78px",
+  width: "78px",
   objectFit: "contain",
-  marginBottom: "8px",
+};
+
+const brandText = {
+  marginTop: "6px",
+  textAlign: "center",
 };
 
 const business = {
-  fontSize: "30px",
+  fontSize: "26px",
   fontWeight: "700",
-  letterSpacing: "0.5px",
+  letterSpacing: "0.4px",
 };
 
 const service = {
-  fontSize: "13px",
-  color: "#666",
+  fontSize: "12px",
+  color: "#555",
   marginTop: "2px",
 };
 
-/* DIVIDER */
-const divider = {
-  height: "1px",
-  background: "#e5e5e5",
-  marginBottom: "30px",
-};
-
-/* HEADER */
 const invoiceHeader = {
   display: "flex",
   justifyContent: "space-between",
-  marginBottom: "30px",
+  marginBottom: "28px",
 };
 
 const invoiceTitle = {
-  fontSize: "24px",
+  fontSize: "22px",
   fontWeight: "700",
   letterSpacing: "1px",
 };
@@ -186,7 +183,6 @@ const label = {
   marginBottom: "6px",
 };
 
-/* SUMMARY */
 const summary = {
   display: "grid",
   gridTemplateColumns: "1fr 1fr 1fr 1.2fr",
@@ -213,7 +209,6 @@ const summaryTotal = {
   fontWeight: "700",
 };
 
-/* TABLE */
 const table = {
   width: "100%",
   borderCollapse: "collapse",
@@ -250,11 +245,10 @@ const tdRight = {
   borderBottom: "1px solid #ddd",
 };
 
-/* TOTALS */
 const totals = {
   width: "42%",
   marginLeft: "auto",
-  marginTop: "24px",
+  marginTop: "22px",
   display: "grid",
   gridTemplateColumns: "1fr 1fr",
   rowGap: "8px",
@@ -270,9 +264,8 @@ const grand = {
   fontWeight: "700",
 };
 
-/* FOOTER */
 const footer = {
-  marginTop: "56px",
+  marginTop: "50px",
   textAlign: "right",
 };
 
@@ -294,4 +287,5 @@ const signRole = {
 };
 
 export default PrintableInvoice;
+
 
