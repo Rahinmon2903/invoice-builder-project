@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import PrintableInvoice from "./PrintableInvoice";
+import PrintableInvoice from "./PrintableInvoice"
 
 const ViewInvoice = () => {
   const { id } = useParams();
