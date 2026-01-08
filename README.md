@@ -49,7 +49,7 @@ src/
 
 🚀 Getting Started
 1️⃣ Clone the Repository
-git clone https://github.com/your-username/invoice-app.git
+git clone https://github.com/Rahinmon2903/invoice-builder-project
 
 2️⃣ Navigate to the Project Folder
 cd invoice-app
