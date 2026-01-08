@@ -1,41 +1,37 @@
-🧾 Invoice Management App (React)
+# 🧾 Invoice Management App (React)
 
-A clean and modern Invoice Management System built with React.
+A clean and modern **Invoice Management System** built with **React**.  
 Create, edit, view, and export professional invoices as PDFs — all stored locally in the browser.
 
-✨ Features
+---
 
-📄 Create professional invoices
+## ✨ Features
 
-✏️ Edit existing invoices
+- 📄 Create professional invoices  
+- ✏️ Edit existing invoices  
+- 👀 View invoice details  
+- 📥 Export invoices as PDF  
+- 🧮 Automatic calculations (Subtotal, Tax, Fees, Grand Total)  
+- 💾 Persistent storage using **LocalStorage**  
+- 🎨 Clean, printable invoice layout (A4 friendly)  
+- ⚡ Fast development with **Vite**
 
-👀 View invoice details
+---
 
-📥 Export invoices as PDF
+## 🛠️ Tech Stack
 
-🧮 Automatic calculation (Subtotal, Tax, Fees, Grand Total)
+- React  
+- React Router  
+- Vite  
+- html2pdf.js  
+- Tailwind CSS  
+- LocalStorage (Browser)
 
-💾 Persistent storage using LocalStorage
+---
 
-🎨 Clean, printable invoice layout (A4 friendly)
+## 📂 Project Structure
 
-⚡ Fast development with Vite
-
-🛠️ Tech Stack
-
-React
-
-React Router
-
-Vite
-
-html2pdf.js
-
-Tailwind CSS
-
-LocalStorage (Browser)
-
-📂 Project Structure
+```text
 src/
 ├── pages/
 │   ├── HomePage.jsx
@@ -52,7 +48,7 @@ src/
 git clone https://github.com/Rahinmon2903/invoice-builder-project
 
 2️⃣ Navigate to the Project Folder
-cd invoice-app
+cd invoice-builder-project
 
 3️⃣ Install Dependencies
 npm install
@@ -74,7 +70,7 @@ Go to Dashboard
 
 Click New Invoice
 
-Fill client, items, tax, and fees
+Fill client details, items, tax, and fees
 
 Save invoice (Draft / Paid / Unpaid)
 
