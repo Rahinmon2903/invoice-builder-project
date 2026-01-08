@@ -14,12 +14,22 @@ const CreateInvoice = () => {
     address: "",
   });
 
+  const generateInvoiceNumber = () => {
+  const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
+
+  const nextNumber = stored.length + 1;
+
+  return `INV-${String(nextNumber).padStart(3, "0")}`;
+};
+
   const [invoice, setInvoice] = useState({
-    invoiceNo: "INV-001",
+    invoiceNo: generateInvoiceNumber(),
     date: new Date().toISOString().slice(0, 10),
     dueDate: "",
     currency: "INR",
   });
+
+  
 
   const [items, setItems] = useState([
     { id: Date.now(), description: "", price: 0, qty: 1, total: 0 },
