@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import html2pdf from "html2pdf.js";
-import PrintableInvoice from "./PrintableInvoice";
+import PrintableInvoice from "../Components/PrintableInvoice";
 import { useNavigate } from "react-router-dom";
 
 const CreateInvoice = () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import html2pdf from "html2pdf.js";
-import PrintableInvoice from "./PrintableInvoice";
+import PrintableInvoice from "../Components/PrintableInvoice";
 
 const EditInvoice = () => {
   const { id } = useParams();
