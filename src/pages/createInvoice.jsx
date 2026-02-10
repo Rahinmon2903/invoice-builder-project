@@ -6,35 +6,37 @@ import { useNavigate } from "react-router-dom";
 const CreateInvoice = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
+  //client info
   const [client, setClient] = useState({
     name: "",
     mobile: "",
     email: "",
     address: "",
   });
-
+    
+// generate invoice number just getting the stored invoice and finding its length and adding 1
   const generateInvoiceNumber = () => {
   const stored = JSON.parse(localStorage.getItem("Invoices") || "[]");
 
   const nextNumber = stored.length + 1;
-
+  //padStart only works on string so we convert nextNumber to string and padStart is used to add 0 before the number 3 means the number length should be 3
   return `INV-${String(nextNumber).padStart(3, "0")}`;
 };
 
   const [invoice, setInvoice] = useState({
     invoiceNo: generateInvoiceNumber(),
+    //make the data type date
     date: new Date().toISOString().slice(0, 10),
     dueDate: "",
     currency: "INR",
   });
 
   
-
+//items
   const [items, setItems] = useState([
     { id: Date.now(), description: "", price: 0, qty: 1, total: 0 },
   ]);
-
+ //tax and fees
   const [taxes, setTaxes] = useState([]);
   const [fees, setFees] = useState([]);
 
@@ -51,14 +53,14 @@ const CreateInvoice = () => {
       })
     );
   };
-
+//when user clicks add item button a new object will created with default which will be reflected in the UI
   const addItem = () => {
     setItems((prev) => [
       ...prev,
       { id: Date.now(), description: "", price: 0, qty: 1, total: 0 },
     ]);
   };
-
+//delete the object by using its id
   const deleteItem = (id) => {
     setItems((prev) => prev.filter((item) => String(item.id) !== String(id)));
   };
@@ -68,19 +70,19 @@ const CreateInvoice = () => {
     () => items.reduce((sum, i) => sum + Number(i.total || 0), 0),
     [items]
   );
-
+//tax
   const totalTax = useMemo(() => {
     return taxes.reduce((sum, t) => {
       const pct = Number(t.percent || 0);
       return sum + (subTotal * pct) / 100;
     }, 0);
   }, [taxes, subTotal]);
-
+//fees
   const totalFees = useMemo(
     () => fees.reduce((sum, f) => sum + Number(f.amount || 0), 0),
     [fees]
   );
-
+//grand total
   const grandTotal = subTotal + totalTax + totalFees;
 
   /* ===== Helpers ===== */

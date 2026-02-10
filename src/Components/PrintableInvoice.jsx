@@ -9,6 +9,8 @@ const PrintableInvoice = ({
   totalFees,
   grandTotal,
 }) => {
+
+  
   const currency =
     invoice.currency === "USD"
       ? "$"
