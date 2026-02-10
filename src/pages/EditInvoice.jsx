@@ -4,6 +4,8 @@ import html2pdf from "html2pdf.js";
 import PrintableInvoice from "../Components/PrintableInvoice";
 
 const EditInvoice = () => {
+
+  // all the parts are same just getting the id and getting data of the particular invoice and  updating it
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
