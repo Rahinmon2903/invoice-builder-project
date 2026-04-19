@@ -75,6 +75,7 @@ const CreateInvoice = () => {
     return taxes.reduce((sum, t) => {
       const pct = Number(t.percent || 0);
       return sum + (subTotal * pct) / 100;
+      
     }, 0);
   }, [taxes, subTotal]);
 //fees
@@ -106,6 +107,17 @@ const CreateInvoice = () => {
     el.style.display = "block";
 
     // Force layout
+    /*With getBoundingClientRect()
+
+    Flow:
+
+   Make element visible
+  Call this function
+  Browser is forced to render it fully
+  Then html2pdf runs
+
+  Result:
+  ✔ correct PDF*/
     el.getBoundingClientRect();
 
     html2pdf()
@@ -212,6 +224,8 @@ const CreateInvoice = () => {
               />
             </div>
           </div>
+
+          {/* Invoice + Items check on readme */}
 
           <div className="bg-white border rounded-xl p-6 space-y-4">
             {[

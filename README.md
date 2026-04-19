@@ -103,3 +103,100 @@ Rahin Mon S
 📜 License
 
 This project is for educational and personal use.
+
+<div className="bg-white border rounded-xl p-6 space-y-4">
+
+  {/* Invoice Number */}
+  <div>
+    <p className="text-xs text-gray-500 mb-1">Invoice number</p>
+    <input
+      type="text"
+      value={invoice.invoiceNo}
+      onChange={(e) =>
+        setInvoice({ ...invoice, invoiceNo: e.target.value })
+      }
+      className="w-full border rounded-md px-3 py-2 text-sm"
+    />
+  </div>
+
+  {/* Creation Date */}
+  <div>
+    <p className="text-xs text-gray-500 mb-1">Creation date</p>
+    <input
+      type="date"
+      value={invoice.date}
+      onChange={(e) =>
+        setInvoice({ ...invoice, date: e.target.value })
+      }
+      className="w-full border rounded-md px-3 py-2 text-sm"
+    />
+  </div>
+
+  {/* Due Date */}
+  <div>
+    <p className="text-xs text-gray-500 mb-1">Due date</p>
+    <input
+      type="date"
+      value={invoice.dueDate}
+      onChange={(e) =>
+        setInvoice({ ...invoice, dueDate: e.target.value })
+      }
+      className="w-full border rounded-md px-3 py-2 text-sm"
+    />
+  </div>
+
+  {/* Currency */}
+  <select
+    value={invoice.currency}
+    onChange={(e) =>
+      setInvoice({ ...invoice, currency: e.target.value })
+    }
+    className="w-full border rounded-md px-3 py-2 text-sm"
+  >
+    <option value="INR">INR (₹)</option>
+    <option value="USD">USD ($)</option>
+    <option value="EUR">EUR (€)</option>
+  </select>
+
+</div>
+
+
+<div className="flex justify-end">
+  <div className="w-full max-w-sm bg-white border rounded-xl p-6 space-y-4">
+    
+    {/* Subtotal */}
+    <div className="flex justify-between text-sm">
+      <span className="text-gray-600">Subtotal</span>
+      <span className="font-medium">
+        {formatCurrency(subTotal)}
+      </span>
+    </div>
+
+    {/* Tax */}
+    <div className="flex justify-between text-sm">
+      <span className="text-gray-600">Tax</span>
+      <span className="font-medium">
+        {formatCurrency(totalTax)}
+      </span>
+    </div>
+
+    {/* Fees */}
+    <div className="flex justify-between text-sm">
+      <span className="text-gray-600">Fees</span>
+      <span className="font-medium">
+        {formatCurrency(totalFees)}
+      </span>
+    </div>
+
+    <hr />
+
+    {/* Grand Total */}
+    <div className="flex justify-between text-lg font-medium">
+      <span>Total</span>
+      <span>
+        {formatCurrency(grandTotal)}
+      </span>
+    </div>
+
+  </div>
+</div>
