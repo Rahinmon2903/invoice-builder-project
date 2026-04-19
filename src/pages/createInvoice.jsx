@@ -245,6 +245,39 @@ const CreateInvoice = () => {
                 />
               </div>
             ))}
+            {/*
+            <div>
+  <p>Invoice number</p>
+  <input
+    value={invoice.invoiceNo}
+    onChange={(e) =>
+      setInvoice({ ...invoice, invoiceNo: e.target.value })
+    }
+  />
+</div>
+
+<div>
+  <p>Creation date</p>
+  <input
+    type="date"
+    value={invoice.date}
+    onChange={(e) =>
+      setInvoice({ ...invoice, date: e.target.value })
+    }
+  />
+</div>
+
+<div>
+  <p>Due date</p>
+  <input
+    type="date"
+    value={invoice.dueDate}
+    onChange={(e) =>
+      setInvoice({ ...invoice, dueDate: e.target.value })
+    }
+  />
+</div>
+            */}
 
             <select
               value={invoice.currency}
